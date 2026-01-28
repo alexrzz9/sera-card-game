@@ -1,48 +1,218 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt">
 <head>
-  <meta charset="UTF-8" />
-  <title>Card Deck</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta charset="UTF-8" />
+<title>SERA Card Game</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<style>
+body {
+  margin: 0;
+  background: #95c11f;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  font-family: Arial, sans-serif;
+}
 
-  <!-- PWA -->
-  <link rel="manifest" href="manifest.json">
-  <meta name="theme-color" content="#0b3d2e">
+/* Títulos */
+h1 {
+  margin: 0;
+  font-size: 36px;
+  color: #fff;
+  font-weight: bold;
+}
 
-  <style>
-    body {
-      margin: 0;
-      background: #0b3d2e;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-    }
-    img {
-      max-width: 90%;
-      max-height: 90%;
-      cursor: pointer;
-    }
-  </style>
+h2 {
+  margin: 5px 0 20px 0;
+  font-size: 24px;
+  color: #fff;
+  font-weight: normal;
+}
+
+.table {
+  position: relative;
+  align-items: center;
+  width: 400px; 
+  height: 300px;
+}
+
+/* Deck */
+.deck {
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  cursor: pointer;
+  z-index: 2;
+  width: 140px;
+  height: 210px;
+  background: #333;
+  color: white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 10px;
+  text-align: center;
+  padding: 10px;
+}
+
+/* Animated card */
+.card {
+  position: absolute;
+  left: 0;
+  top: 50%;
+  width: 140px;
+  height: 210px;
+  pointer-events: none;
+  transform: translateY(-50%);
+  z-index: 3;
+  border-radius: 10px;
+  overflow: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  padding: 10px;
+  box-sizing: border-box;
+  background: #fff;
+  color: #333;
+  font-weight: bold;
+}
+
+/* Card states */
+.card.reset {
+  transition: none;
+  transform: translateY(-50%) translateX(0);
+  left: 10px;
+}
+
+.card.move {
+  transition: transform 0.8s ease;
+  transform: translateY(-50%) translateX(260px);
+}
+
+/* Stack */
+.stack {
+  position: absolute;
+  left: 260px; 
+  top: 50%;
+  transform: translateY(-50%);
+  width: 140px;
+  height: 210px;
+}
+
+.stack-card {
+  position: absolute;
+  width: 140px;
+  height: 210px;
+  border-radius: 10px;
+  background: #fff;
+  color: #333;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 10px;
+  box-sizing: border-box;
+  font-weight: bold;
+  text-align: center;
+}
+
+h3 {
+    width: 300px;
+    text-align: center;
+}
+</style>
 </head>
 <body>
 
-<img id="card" />
+<h1>SERA Card Game</h1>
+<h2>Temas polémicos</h2>
+<h3>Depois de cada tema acabar é dado um score de 0 a 10 por cada um dos outros membros.
+Caso a media de polémica seja abaixo de 5, tens de beber!
+Ganha quem tiver a maior media de polémica no fim.</h3>
+
+<div class="table">
+
+  <!-- Deck -->
+  <div class="deck" id="deck">Deck (Clique)</div>
+
+  <!-- Pilha de cartas -->
+  <div class="stack" id="stack"></div>
+
+  <!-- Carta animada -->
+  <div class="card reset" id="card">Clique no deck!</div>
+
+</div>
 
 <script>
-  const cards = [
-    "cards/card1.png",
-    "cards/card2.png",
-    "cards/card3.png"
-  ];
+const allCards = [
+  "Cenário Hipotético: Cria um cenário hipotético que exponha um dilema polémico.",
+  "Opinião Extrema: Defende uma opinião extrema, mesmo que não concordes.",
+  "Pergunta Incómoda: Lança uma pergunta que deixe o grupo desconfortável.",
+  "Split the Table: Apresenta duas opções opostas. O grupo tem de escolher a mais polémica.",
+  "Hot Take: Partilha uma opinião com a qual ninguém concorda.",
+  "Cold Take: Partilha uma opinião com a qual toda a gente vai concordar, mas finge que pensas ser um hot take.",
+  "Bebe: Bebe só meu rei",
+  "PV: Product Owner",
+  "SK: Scrum Knight",
+  "UX: Designer",
+  "DEV: Developer"
+];
 
-  function showRandomCard() {
-    const card = cards[Math.floor(Math.random() * cards.length)];
-    document.getElementById("card").src = card;
+let deck = [];
+let stackCount = 0;
+
+function shuffle(array) {
+  for (let i = array.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [array[i], array[j]] = [array[j], array[i]];
   }
+}
 
-  document.getElementById("card").onclick = showRandomCard;
-  showRandomCard();
+function resetDeck() {
+  deck = [...allCards];
+  shuffle(deck);
+  stackCount = 0;
+  document.getElementById("stack").innerHTML = "";
+}
+
+function drawCard() {
+  if (deck.length === 0) resetDeck();
+  return deck.pop();
+}
+
+resetDeck();
+
+const deckEl = document.getElementById("deck");
+const cardEl = document.getElementById("card");
+const stackEl = document.getElementById("stack");
+
+deckEl.onclick = () => {
+  const newCard = drawCard();
+
+  // Reset card
+  cardEl.classList.remove("move");
+  cardEl.classList.add("reset");
+  cardEl.textContent = newCard;
+
+  void cardEl.offsetWidth; // força repaint
+
+  // anima
+  cardEl.classList.remove("reset");
+  cardEl.classList.add("move");
+
+  // opcional: adiciona à pilha invisível
+  setTimeout(() => {
+    const stacked = document.createElement("div");
+    stacked.className = "stack-card";
+    stacked.textContent = newCard;
+    stacked.style.zIndex = stackCount + 1;
+    stackEl.appendChild(stacked);
+    stackCount++;
+  }, 800);
+};
 </script>
 
 </body>
