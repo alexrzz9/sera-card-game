@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Card Deck</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <!-- PWA -->
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#0b3d2e">
+
+  <style>
+    body {
+      margin: 0;
+      background: #0b3d2e;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+    img {
+      max-width: 90%;
+      max-height: 90%;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+<img id="card" />
+
+<script>
+  const cards = [
+    "cards/card1.png",
+    "cards/card2.png",
+    "cards/card3.png"
+  ];
+
+  function showRandomCard() {
+    const card = cards[Math.floor(Math.random() * cards.length)];
+    document.getElementById("card").src = card;
+  }
+
+  document.getElementById("card").onclick = showRandomCard;
+  showRandomCard();
+</script>
+
+</body>
+</html>

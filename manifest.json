@@ -1,0 +1,15 @@
+{
+  "name": "Card Deck",
+  "short_name": "Cards",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#0b3d2e",
+  "theme_color": "#0b3d2e",
+  "icons": [
+    {
+      "src": "icon.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
